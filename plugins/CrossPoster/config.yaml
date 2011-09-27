@@ -72,3 +72,4 @@ applications:
         callbacks:
             template_source.cfg_content_nav: $CrossPoster::CrossPoster::App::CMS::_cfg_content_nav
             template_param.edit_entry: $CrossPoster::CrossPoster::App::CMS::_edit_entry_param
+            cms_post_save.entry: $CrossPoster::CrossPoster::App::CMS::CMSPostSave_entry

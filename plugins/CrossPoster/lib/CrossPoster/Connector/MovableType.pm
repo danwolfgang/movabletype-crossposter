@@ -6,10 +6,11 @@ use strict;
 
 sub edit_uri { 
 	my $self = shift;
+	my ($app) = shift;
 	my ($account, $entry) = @_;
-	
+
 	my $cache = $entry->crossposter_cache || {};
-	
+
 	return $cache->{$account->id};	
 } 
 

@@ -101,7 +101,7 @@ sub edit_crossposting_account {
     $param->{connectors} = \@connectors_loop;
     $param->{author_id} = $app->user->id;
         
-    return $app->build_page($plugin->load_tmpl('edit_account.tmpl'), $param);   
+    return $app->build_page($plugin->load_tmpl('edit_account.tmpl'), $param);
 }
 
 sub _cfg_content_nav {
@@ -154,7 +154,7 @@ sub _edit_entry_param {
     
     my $crossposter_field = $tmpl->createElement('app:setting', { id => 'select-crossposters', label => $plugin->translate('Crosspost To') });
     
-    $innerHTML = <<HTML;
+    my $innerHTML = <<HTML;
 <mt:loop name="crossposter_accts_loop">
     <label><input type="checkbox" name="crosspost_acct_<mt:var name="id">" value="1" class="add-category-checkbox"<mt:if name="is_selected"> checked="checked"</mt:if> /> <mt:var name="name"></label><br />
 </mt:loop>
@@ -212,10 +212,11 @@ sub _cross_post {
     $api->password( $passwd || $account->passwd );  
     
     require XML::Atom::Entry;
-    require CrossPoster::Cache;
-    my $cache = CrossPoster::Cache->load({ entry_id => $entry->id, 
-                    blog_id => $entry->blog_id, account_id => $account->id });
-    
+    #require CrossPoster::Cache;
+    #my $cache = CrossPoster::Cache->load({ entry_id => $entry->id, 
+    #                blog_id => $entry->blog_id, account_id => $account->id });
+    my $cache;#$entry->crossposter_cache || {};
+
     if($cache) {
         eval { $api_url = $connector_class->edit_uri($app, $account, $entry); };
         
@@ -269,9 +270,9 @@ sub _cross_post {
 
     if(my $entry_details_meth = $connector_class->can('entry_details')) {
         eval { $xml_entry = $entry_details_meth->($connector_class, $app, $account, $entry, $xml_entry); };
-        
+
         return _show_error($plugin, $app, $@, 0)
-            if $@;      
+            if $@;
     }
 
     require MT::Log;
@@ -291,14 +292,14 @@ sub _cross_post {
         $api_response = $api->createEntry( $api_url, $xml_entry )
                 or return _show_error($plugin, $app, $api->errstr);
     
-        $cache = CrossPoster::Cache->new;
-        $cache->set_values({
-            entry_id    => $entry->id,
-            blog_id     => $entry->blog_id,
-            account_id  => $account->id,
-            response    => $api_response
-        });
-        $cache->save or die $cache->errstr;
+        # $cache = CrossPoster::Cache->new;
+        # $cache->set_values({
+        #     entry_id    => $entry->id,
+        #     blog_id     => $entry->blog_id,
+        #     account_id  => $account->id,
+        #     response    => $api_response
+        # });
+        # $cache->save or die $cache->errstr;
         
         $app->log({
             message     => $app->translate("Entry '[_1]' (ID:[_2]) cross-posted to '[_3]' by user '[_4]'", $entry->title, $entry->id, $account->name, $app->user->name),
